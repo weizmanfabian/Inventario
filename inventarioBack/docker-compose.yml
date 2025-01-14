@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: inventario
+    restart: always
+    volumes:
+      # Scripts de inicialización en orden de ejecución
+      - ./db/sql/create_schema.sql:/docker-entrypoint-initdb.d/1.create_schema.sql
+      - ./db/sql/data.sql:/docker-entrypoint-initdb.d/2.data.sql
+      - ./db/sql/sp/sp_actualizar_inventario.sql:/docker-entrypoint-initdb.d/3.sp_actualizar_inventario.sql
+    environment:
+      - POSTGRES_DB=inventario
+      - POSTGRES_USER=weizman
+      - POSTGRES_PASSWORD=YourStrong#Passw0rd
+    ports:
+      - "5437:5432"
