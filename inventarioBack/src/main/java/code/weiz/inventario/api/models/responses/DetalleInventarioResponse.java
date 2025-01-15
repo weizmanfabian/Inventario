@@ -11,5 +11,5 @@ import lombok.*;
 @ToString
 public class DetalleInventarioResponse {
     private ProductoResponse producto;
-    private Double cantidad;
+    private Integer cantidad;
 }

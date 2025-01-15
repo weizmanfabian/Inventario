@@ -10,10 +10,11 @@ import lombok.*;
 @Builder
 @ToString
 public class ProductoResponse {
-    private Integer id;
+    private Long id;
     private String nombre;
-    private Double stock;
+    private Integer stock;
     private Double precio;
+    private Integer stockMinimo;
     private String caracteristicas;
     private EstadoEnum estado;
 }

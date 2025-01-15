@@ -1,5 +1,6 @@
 package code.weiz.inventario.api.models.requests;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 
@@ -10,6 +11,9 @@ import lombok.*;
 @Builder
 @ToString
 public class DetalleInventarioRequest {
+    @NotNull(message = "El ID del producto es requerido")
     private Long idProducto;
-    private Double cantidad;
+
+    @NotNull(message = "la cantidad es requerida")
+    private Integer cantidad;
 }
