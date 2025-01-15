@@ -6,6 +6,7 @@ import code.weiz.inventario.api.models.responses.InventarioResponse;
 import code.weiz.inventario.domain.entities.InventarioEntity;
 import code.weiz.inventario.domain.repositories.InventarioRepository;
 import code.weiz.inventario.infraestructure.services.imp.IInventarioService;
+import code.weiz.inventario.mapper.InventarioRowMapper;
 import code.weiz.inventario.util.exceptions.InventarioException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -16,9 +17,11 @@ import org.springframework.jdbc.core.SqlParameterValue;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,50 +35,67 @@ public class InventarioService implements IInventarioService {
     private final JdbcTemplate jdbcTemplate;
     private final InventarioRepository inventarioRepository;
 
+
     @Override
     public Set<InventarioResponse> consultarElEstadoActualDelInventario() {
-        return this.readAll();
+        try {
+            String sql = "SELECT * FROM fn_consultar_el_estado_actual_del_inventario()";
+
+            List<InventarioResponse> inventarios = jdbcTemplate.query(
+                    sql,
+                    new InventarioRowMapper()
+            );
+
+            return new HashSet<>(inventarios);
+
+        } catch (DataAccessException e) {
+            log.error("Error execute FN consultarElEstadoActualDelInventario", e);
+            String errorMessage = e.getMostSpecificCause() != null && e.getMostSpecificCause().getMessage() != null
+                    ? e.getMostSpecificCause().getMessage()
+                    : "Error desconocido";
+            throw new InventarioException(errorMessage);
+        }
     }
 
     @Override
     public void registrarEntradasYSalidas(InventarioRequest request) {
         try {
-            //convertimos la lista de detallesInventario a un array sql
-            //Object[] detalles = convertirDetallesAArray1(request.getDetallesInventario());
-            //String detalles = convertirDetallesAArray(request.getDetallesInventario());
-            java.sql.Array detalles = convertirDetallesAArray(request.getDetallesInventario());
+            // Convierto los detalles a sql array
+            java.sql.Array detallesArray = convertirDetallesAArray(request.getDetallesInventario());
 
-            //log.info("Detalles ARRAY: " + detalles.toString());
+            // determino los tipos de parametros
+            SqlParameterValue userIdParam = new SqlParameterValue(Types.INTEGER, request.getIdUsuario());
+            SqlParameterValue inventoryTypeParam = new SqlParameterValue(Types.VARCHAR, request.getTipoInventario().name());
+            SqlParameterValue observationsParam = new SqlParameterValue(Types.VARCHAR, request.getObservaciones());
+            SqlParameterValue detailsParam = new SqlParameterValue(Types.ARRAY, detallesArray);
 
-            // Especifica los tipos de parámetros
-            SqlParameterValue idUsuarioParam = new SqlParameterValue(Types.INTEGER, request.getIdUsuario());
-            SqlParameterValue tipoInventarioParam = new SqlParameterValue(Types.VARCHAR, request.getTipoInventario().name());
-            SqlParameterValue observacionesParam = new SqlParameterValue(Types.VARCHAR, request.getObservaciones());
-            SqlParameterValue detallesParam = new SqlParameterValue(Types.ARRAY, detalles);
-
+            // Ejecuto el procedimiento almacenado
             jdbcTemplate.update("CALL sp_actualizar_inventario(?, ?, ?, ?)",
-                    idUsuarioParam,
-                    tipoInventarioParam,
-                    observacionesParam,
-                    detallesParam);
+                    userIdParam,
+                    inventoryTypeParam,
+                    observationsParam,
+                    detailsParam);
 
         } catch (DataAccessException e) {
-            log.error("Error al ejecutar el procedimiento almacenado: ", e);
-
-            String mensaje = e.getMostSpecificCause() != null && e.getMostSpecificCause().getMessage() != null
+            log.error("Error execute SP registrarEntradasYSalidas", e);
+            String errorMessage = e.getMostSpecificCause() != null && e.getMostSpecificCause().getMessage() != null
                     ? e.getMostSpecificCause().getMessage()
                     : "Error desconocido";
-            if (mensaje.contains("El usuario no existe")) {
-                throw new InventarioException("Usuario no encontrado");
-            } else if (mensaje.contains("No hay suficiente stock")) {
-                throw new InventarioException("Stock insuficiente para algunos productos");
-            } else if (mensaje.contains("Uno o más productos no existen")) {
-                throw new InventarioException("Uno o más productos no existen en el sistema");
-            }
-            throw new InventarioException("Error al actualizar inventario: " + mensaje);
+            throw new InventarioException(getExceptionMessage(errorMessage));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String getExceptionMessage(String errorMessage) {
+        if (errorMessage.contains("El usuario no existe")) {
+            return "Usuario no encontrado";
+        } else if (errorMessage.contains("No hay suficiente stock")) {
+            return "Stock insuficiente para algunos productos";
+        } else if (errorMessage.contains("Uno o más productos no existen")) {
+            return "Uno o más productos no existen en el sistema";
+        }
+        return "Error al actualizar inventario: " + errorMessage;
     }
 
     private java.sql.Array convertirDetallesAArray(List<DetalleInventarioRequest> detalles) throws SQLException {
@@ -145,28 +165,4 @@ public class InventarioService implements IInventarioService {
         return sb.toString();
     }
 
-    @Override
-    public Set<InventarioResponse> readAll() {
-        return inventarioRepository.findAll().stream().map(InventarioEntity::entityToResponse).collect(Collectors.toSet());
-    }
-
-    @Override
-    public InventarioResponse create(InventarioRequest request) {
-        return null;
-    }
-
-    @Override
-    public InventarioResponse readById(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public InventarioResponse update(InventarioRequest request, Long aLong) throws InvocationTargetException, IllegalAccessException {
-        return null;
-    }
-
-    @Override
-    public void delete(Long aLong) {
-
-    }
 }

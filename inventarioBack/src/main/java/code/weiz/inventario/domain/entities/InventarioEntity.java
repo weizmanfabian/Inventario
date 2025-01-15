@@ -48,16 +48,5 @@ public class InventarioEntity {
     )
     private Set<DetalleInventarioEntity> detallesInventario;
 
-    public static InventarioResponse entityToResponse(InventarioEntity inventario) {
-        return InventarioResponse.builder()
-                .id(inventario.getId())
-                .fechaHora(inventario.getFechaHora())
-                .total(inventario.getTotal())
-                .usuario(UsuarioEntity.entityToResponse(inventario.getUsuario()))
-                .tipo(inventario.getTipo())
-                .observaciones(inventario.getObservaciones())
-                .detallesInventario(inventario.getDetallesInventario().stream().map(DetalleInventarioEntity::entityToResponse).collect(Collectors.toSet()))
-                .build();
-    }
 
 }

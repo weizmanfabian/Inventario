@@ -1,7 +1,6 @@
 package code.weiz.inventario.infraestructure.abstractService;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Set;
 
 public interface CrudService<Req, Res, Id> {
