@@ -1,0 +1,260 @@
+{
+	"info": {
+		"_postman_id": "de8735f7-8b95-4447-b14d-1700da067739",
+		"name": "Inventario",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17147091"
+	},
+	"item": [
+		{
+			"name": "test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/test",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "well-known",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/.well-known/oauth-authorization-server",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						".well-known",
+						"oauth-authorization-server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res = pm.response.json();\r",
+							"pm.globals.set('token', res.access_token);\r",
+							"console.log(\"token: \" + res.access_token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "secret",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "client",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic Y2xpZW50OnNlY3JldA=="
+					},
+					{
+						"key": "Cookie",
+						"value": "JSESSIONID=8F3C03E633204CAA6ED7400E13A8C0D1"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "redirect_uri",
+							"value": "https://oauthdebugger.com/debug",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code",
+							"type": "text"
+						},
+						{
+							"key": "code",
+							"value": "Z80-fDQwncnZnKiSy7c8sq0L4wqB9B8o97yeaL7-rTxf8Ns536V6HEmPf6UVDZlFog5jCx9P4elUxNWKtcWqKiw6vkIEnigDlMqzU4utHYzscx_r1udkw_hpdLWkUvaM",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8087/inventario/oauth2/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8087",
+					"path": [
+						"inventario",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "Generated from cURL: curl --location 'http://localhost:8087/inventario/oauth2/token' \\\r\n--header 'Content-Type: application/x-www-form-urlencoded' \\\r\n--header 'Authorization: Basic Y2xpZW50OnNlY3JldA==' \\\r\n--header 'Cookie: JSESSIONID=8F3C03E633204CAA6ED7400E13A8C0D1' \\\r\n--data-urlencode 'redirect_uri=https://oauthdebugger.com/debug' \\\r\n--data-urlencode 'grant_type=authorization_code' \\\r\n--data-urlencode 'code=iIifheHfsl1eDDtdL-kfMQ0DqN4OE2gXIekxTptmEx-m4WfnQlEplzRLjs0np76bHo8jEhzPZpGKm0Ls5ksNn4gojSzReeDqavwVTplXVjOiAFCRSadqYFRqQGij5cJs'"
+			},
+			"response": []
+		},
+		{
+			"name": "consultar-el-estado-actual",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/user/consultar",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"consultar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "entrada",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"idUsuario\": 1,\r\n  \"tipoInventario\": \"ENTRADA\",\r\n  \"observaciones\": \"Todo perfect. Esto es el TEST 1\",\r\n  \"detallesInventario\": [\r\n    {\r\n      \"idProducto\": 1,\r\n      \"cantidad\": 15\r\n    },\r\n    {\r\n      \"idProducto\": 2,\r\n      \"cantidad\": 15\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/actualizar-inventario",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"actualizar-inventario"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "salida",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"idUsuario\": 1,\r\n  \"tipoInventario\": \"SALIDA\",\r\n  \"observaciones\": \"Todo perfect. Esto es el TEST 2\",\r\n  \"detallesInventario\": [\r\n    {\r\n      \"idProducto\": 1,\r\n      \"cantidad\": 4\r\n    },\r\n    {\r\n      \"idProducto\": 2,\r\n      \"cantidad\": 4\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/actualizar-inventario",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"actualizar-inventario"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:8086/inventario",
+			"type": "string"
+		}
+	]
+}

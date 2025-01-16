@@ -15,7 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Slf4j
 @SpringBootApplication
-public class InventarioApplication implements CommandLineRunner {
+public class InventarioApplication  {
 
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -28,9 +28,6 @@ public class InventarioApplication implements CommandLineRunner {
 		SpringApplication.run(InventarioApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		//this.usuarioRepository.findAll().forEach(user -> log.info(user.getEmail() + " - " + this.bCryptPasswordEncoder.encode(user.getPassword())));
-	}
+
 
 }
