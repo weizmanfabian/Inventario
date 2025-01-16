@@ -1,3 +1,5 @@
+
+
 CREATE TYPE detalle_inventario_type AS (
     producto_id INTEGER,
     cantidad NUMERIC(10,2)
@@ -6,7 +8,7 @@ CREATE TYPE detalle_inventario_type AS (
 CREATE OR REPLACE PROCEDURE sp_actualizar_inventario(
     usuario_id INTEGER,
     tipo_inventario VARCHAR(50),
-    observaciones TEXT,
+    observaciones VARCHAR(500),
     detalles detalle_inventario_type[]
 ) language plpgsql as $$
 DECLARE
@@ -106,3 +108,12 @@ EXCEPTION
     WHEN OTHERS THEN
         RAISE EXCEPTION 'Error en sp_actualizar_inventario: %', SQLERRM;
 END;$$;
+
+/*
+CALL sp_actualizar_inventario(
+    1,
+    'ENTRADA',
+    'Inventario de prueba',
+    ARRAY[(1, 10)::detalle_inventario_type, (2, 20)::detalle_inventario_type]
+);
+*/

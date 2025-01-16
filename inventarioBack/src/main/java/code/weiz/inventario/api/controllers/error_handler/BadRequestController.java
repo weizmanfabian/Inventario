@@ -4,19 +4,16 @@ import code.weiz.inventario.api.models.responses.errors.BaseErrorResponse;
 import code.weiz.inventario.api.models.responses.errors.ErrorResponse;
 import code.weiz.inventario.api.models.responses.errors.ErrorsResponse;
 import code.weiz.inventario.util.exceptions.IdNotFoundException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import code.weiz.inventario.util.exceptions.InventarioException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 //status code 400
 
@@ -59,82 +56,23 @@ public class BadRequestController {
                 .build();
     }
 
-    /**
-     * Maneja HttpMessageNotReadableException, que puede ocurrir por ejemplo, cuando un enum tiene un valor inválido.
-     *
-     * @param exception La excepción HttpMessageNotReadable capturada.
-     * @return Una respuesta de error adecuada dependiendo del tipo de error de formato.
-     */
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public BaseErrorResponse handleHttpMessageNotReadable(HttpMessageNotReadableException exception) {
-        if (exception.getCause() instanceof InvalidFormatException) {
-            InvalidFormatException ife = (InvalidFormatException) exception.getCause();
-            if (ife.getTargetType().isEnum()) {
-                // Maneja específicamente el formato inválido para los enums.
-                return handleInvalidEnumFormat(ife);
-            }
-        }
-        // Responde con un mensaje de error general para otros tipos de errores de formato.
-        return buildErrorResponse("Error en el formato del mensaje", HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Construye una respuesta de error para un formato inválido específico de enums.
-     *
-     * @param ife La excepción de formato inválido.
-     * @return Una respuesta de error con detalles sobre el campo enum inválido.
-     */
-    private BaseErrorResponse handleInvalidEnumFormat(InvalidFormatException ife) {
-        Map<String, String> errors = new HashMap<>();
-        String fieldName = ife.getPath().stream()
-                .map(JsonMappingException.Reference::getFieldName)
-                .collect(Collectors.joining("."));
-
-        // Modifica el mensaje de error para incluir "@RequestParam Tipo de dato inválido"
-        String errorMessage = "Tipo de dato inválido";
-        errors.put(fieldName, errorMessage);
-
-        return ErrorsResponse.builder()
-                .errors(errors)
-                .status(HttpStatus.BAD_REQUEST.name())
-                .code(HttpStatus.BAD_REQUEST.value())
-                .build();
-    }
-
-    /**
-     * Método de ayuda para construir una respuesta de error genérica.
-     *
-     * @param message El mensaje de error.
-     * @param status  El estado HTTP para la respuesta.
-     * @return Una respuesta de error construida.
-     */
-    private ErrorResponse buildErrorResponse(String message, HttpStatus status) {
+    @ExceptionHandler(InventarioException.class)
+    public BaseErrorResponse handleInventarioException(InventarioException exception) {
         return ErrorResponse.builder()
-                .message(message)
-                .status(status.name())
-                .code(status.value())
-                .build();
-    }
-
-    /**
-     * Maneja MethodArgumentTypeMismatchException para errores en parámetros @RequestParam y @RequestHeader.
-     *
-     * @param exception La excepción capturada.
-     * @return Una respuesta de error con detalles sobre el parámetro incorrecto.
-     */
-
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public BaseErrorResponse handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException exception) {
-        String paramName = exception.getName();
-        String errorMessage = "Tipo de dato incorrecto";
-
-        Map<String, String> errors = new HashMap<>();
-        errors.put(paramName, errorMessage);
-
-        return ErrorsResponse.builder()
-                .errors(errors)
+                .message(exception.getMessage())
                 .status(HttpStatus.BAD_REQUEST.name())
                 .code(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
+
+    @ExceptionHandler(DataAccessException.class)
+    public BaseErrorResponse handleDataAccessException(DataAccessException exception) {
+        return ErrorResponse.builder()
+                .message("Error al acceder a la base de datos: " +
+                        exception.getMostSpecificCause().getMessage())
+                .status(HttpStatus.BAD_REQUEST.name())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .build();
+    }
+
 }

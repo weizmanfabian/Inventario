@@ -1,11 +1,13 @@
-package code.weiz.inventario.domain;
+package code.weiz.inventario.domain.entities;
 
+import code.weiz.inventario.api.models.responses.InventarioResponse;
 import code.weiz.inventario.util.enums.TipoInventarioEnum;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -13,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name = "INVENTARIOS")
 public class InventarioEntity {
     @Id
@@ -22,13 +25,14 @@ public class InventarioEntity {
     @Column(name = "INV_FECHA_HORA")
     private LocalDateTime fechaHora;
     @Column(name = "INV_TOTAL")
-    private Double total;
+    private Integer total;
 
     //@Column(name = "INV_USU_ID")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "INV_USU_ID", nullable = false)
     private UsuarioEntity usuario;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "INV_TIPO")
     private TipoInventarioEnum tipo;
     @Column(name = "INV_OBSERVACIONES")
@@ -43,5 +47,6 @@ public class InventarioEntity {
             mappedBy = "inventario"
     )
     private Set<DetalleInventarioEntity> detallesInventario;
+
 
 }

@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -9,7 +8,8 @@ services:
       # Scripts de inicialización en orden de ejecución
       - ./db/sql/create_schema.sql:/docker-entrypoint-initdb.d/1.create_schema.sql
       - ./db/sql/data.sql:/docker-entrypoint-initdb.d/2.data.sql
-      - ./db/sql/sp/sp_actualizar_inventario.sql:/docker-entrypoint-initdb.d/3.sp_actualizar_inventario.sql
+      - ./db/sql/storeProcedure/sp_actualizar_inventario.sql:/docker-entrypoint-initdb.d/3.sp_actualizar_inventario.sql
+      - ./db/sql/function/fn_consultar_el_estado_actual_del_inventario.sql:/docker-entrypoint-initdb.d/4.fn_consultar_el_estado_actual_del_inventario.sql
     environment:
       - POSTGRES_DB=inventario
       - POSTGRES_USER=weizman
