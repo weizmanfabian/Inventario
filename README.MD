@@ -1,6 +1,4 @@
-Aquí tienes una versión profesional y bien estructurada del contenido proporcionado para el README.md:
 
-```markdown
 # Sistema de Gestión de Inventarios
 
 [![Java](https://img.shields.io/badge/Java-17-red.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
