@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
+@RequestMapping("/user")
 @RestController
-@RequestMapping
 @AllArgsConstructor
 @Slf4j
 @CrossOrigin(origins = "*", allowedHeaders = "*")

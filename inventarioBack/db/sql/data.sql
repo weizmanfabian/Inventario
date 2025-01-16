@@ -1,12 +1,12 @@
 INSERT INTO USUARIOS (
-    USU_NOMBRE, USU_EMAIL, USU_PASSWORD, USU_TIPO_DOCUMENTO, 
+    USU_NOMBRE, USU_EMAIL, USU_PASSWORD_NOT_ENCRYPTED, USU_PASSWORD, USU_TIPO_DOCUMENTO,
     USU_NUMERO_DOCUMENTO, USU_ESTADO, USU_FECHA_CREACION, USU_FECHA_ACTUALIZACION
 ) VALUES 
-    ('Weizman Herreño', 'weizman.herreno@email.com', 'password123', 'CC', '1234567890', 'ACTIVO',
+    ('Weizman Herreño', 'weizman.herreno@email.com', 'password123', '$2a$10$XKuGTy.O4kVsCQ/IWXstZOIGHj14nbeOvmxBgOF68OMiuTWkf9dCy', 'CC', '1234567890', 'ACTIVO',
     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('María González', 'maria.gonzalez@email.com', 'password456', 'CE', '9876543210', 'ACTIVO', 
+    ('María González', 'maria.gonzalez@email.com', 'password456', '$2a$10$5AnQK9N/LNAFS/AxGgD/6.N4NZxTbGVAWTz3TeeSeSOJ65QmiBide', 'CE', '9876543210', 'ACTIVO',
     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('Carlos Rodríguez', 'carlos.rodriguez@email.com', 'password789', 'NIT', '8001234567', 'INACTIVO', 
+    ('Carlos Rodríguez', 'carlos.rodriguez@email.com', 'password789', '$2a$10$IT7JhjUaXvOArBxqZVuQ6uLsiyrmnRrerzgh4K957OHYYH7x0oX/.', 'NIT', '8001234567', 'INACTIVO',
     CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO PRODUCTOS (
